@@ -5,8 +5,6 @@
 #include "jeu.h"
 #include <ctype.h>
 
-//Ajouter mode 2 joueurs
-
 int menu();
 void convetMajMot(signed char *motMin);
 
