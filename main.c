@@ -2,22 +2,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include "selectMot.h"
-#include "drawPendu.h"
+#include "jeu.h"
 #include <ctype.h>
 
 //Ajouter mode 2 joueurs
 
 int menu();
-void convertMajLettre(char *lettreMin);
 void convetMajMot(signed char *motMin);
 
 int main(void)
 {
     signed char motSecret[100] = {0};
-    signed char lettreJoueur = 0;
     signed char motCacher[100] = {0};
     int nbLettre = 0;
-    int nbCoups = 0;
     int sortir = 0;
     char sortirJeu = 'N';
 
@@ -31,60 +28,11 @@ int main(void)
 
                 while (sortirJeu != 'N')
                 {
-                    nbCoups = 10;
                     nbLettre = 0;
                     memset(motCacher, 0, sizeof(motCacher));
 
                     selectMot(motSecret);
-
-                    nbLettre = strlen(motSecret); //Compte le nombre de caractères du mot
-                    for(int f=0; f<nbLettre; f++)
-                    {
-                        motCacher[f] = '*';
-                    }
-                    
-                    printf("motCacher : %s\n", motCacher);
-
-                    while (strchr(motCacher, '*') != NULL && nbCoups != 0)
-                    {
-                        printf("\n");
-                        drawPendu(nbCoups); //Figure du pendu qui se dessine
-                        printf("Mot cacher : %s\n", motCacher);
-
-                        printf("Il vous reste %d coup !\n", nbCoups);
-
-                        printf("Taper une lettre : ");
-                        while(getchar() != '\n'); //Liberer le Buffer (Charactère gardé en mémoire)
-                        scanf("%c", &lettreJoueur);
-                        convertMajLettre(&lettreJoueur);
-                        printf("lettre : %c\n", lettreJoueur);
-
-                        if((strchr(motSecret, lettreJoueur)) == NULL)
-                        {
-                            nbCoups--;
-                        }
-                        else
-                        {
-                            for(int i=0; motSecret[i] != '\0'; i++) //Remplacement des * par les lettres trouvé
-                            {
-                                if(motSecret[i] == lettreJoueur)
-                                {
-                                    motCacher[i] = lettreJoueur;
-                                }
-                            }
-                        }
-                    }
-
-                    if(nbCoups != 0)
-                    {
-                        printf("Bravo vous avez gagnez le mot cacher etais : %s\n\n", motSecret);
-                    }
-                    else
-                    {
-                        drawPendu(nbCoups);
-                        printf("Vous avez perdu !\n");
-                        printf("Le mot etait : %s\n\n", motSecret);
-                    }
+                    jeu(motSecret, motCacher, &nbLettre);
 
                     printf("Voulez-vous rejouer ? (O/N) ");
                     while(getchar() != '\n'); //Liberer le Buffer (Charactère gardé en mémoire)
@@ -102,8 +50,18 @@ int main(void)
                 
                 while (sortirJeu != 'N')
                 {
-                    printf("Mot a cacher");
-                    printf("\r\r"); //Cacher la saisie du joueur 1
+                    nbLettre = 0;
+                    memset(motCacher, 0, sizeof(motCacher));
+
+                    printf("Joueur 1 taper le mot secret : ");
+                    scanf("%s", motSecret);
+                    convetMajMot(motSecret);
+                    
+                    for(int e = 0; e < 1000; e++)
+                        printf("\n"); //Cacher la saisie du joueur 1
+
+                    jeu(motSecret, motCacher, &nbLettre);
+
                     printf("Voulez-vous rejouer ? (O/N) ");
                     while(getchar() != '\n'); //Liberer le Buffer (Charactère gardé en mémoire)
                     scanf("%c", &sortirJeu);
@@ -195,11 +153,6 @@ int menu()
     }
 
     return choix;
-}
-
-void convertMajLettre(char *lettreMin)
-{
-    *lettreMin = toupper(*lettreMin);
 }
 
 void convetMajMot(signed char *motMin)
